@@ -1,0 +1,13 @@
+using UnityEngine;
+
+public class MovementLR2d : MonoBehaviour
+{
+    public float speed = 2.5f;
+
+    void Update()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+
+        transform.position = transform.position + new Vector3(horizontal * speed * Time.deltaTime, 0, 0);
+    }
+}
