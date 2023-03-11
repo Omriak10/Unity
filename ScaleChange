@@ -1,0 +1,91 @@
+using UnityEngine;
+
+public class ScaleChange : MonoBehaviour
+{
+    private Animator anim;
+    public Vector3 newScale = new Vector3(0.1433375f, 0.135406f, 1f);
+    public Vector3 newScale2 = new Vector3(-0.1433375f, 0.135406f, 1f);
+    private Vector3 originalScale;
+    private bool isScaled = false;
+    private bool isFacingLeft = false;
+    private bool isJumping = false;
+    private bool isAttacking = false;
+    private bool isFpressed = false;
+
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+        originalScale = transform.localScale;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            isScaled = !isScaled;
+            transform.localScale = isScaled ? newScale : originalScale;
+        }
+
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            anim.Play("Character Walking");
+            transform.localScale = isScaled ? newScale : originalScale;
+            isFacingLeft = false;
+        }
+        else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            anim.Play("Character Walking");
+            transform.localScale = isScaled ? newScale2 : originalScale;
+            isFacingLeft = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
+        {
+            isJumping = true;
+            anim.Play("JumpingAnim");
+        }
+        else if (isJumping)
+        {
+            // freeze the animation until landing on object tagged "Ground"
+            // check for landing on "Ground" here
+        }
+        else if(isAttacking)
+        {
+            if(anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 5f)
+            {
+                isAttacking = false;
+                anim.Play("Character Idle");
+            }
+        }
+        else if(isFpressed)
+        {
+            anim.Play("Block");
+        }
+        else
+        {
+            anim.Play("Character Idle");
+        }
+        
+        if (Input.GetKeyDown(KeyCode.E) && !isAttacking)
+        {
+            isAttacking = true;
+            anim.Play("Attack");
+        }
+        if (Input.GetKey(KeyCode.F))
+        {
+            isFpressed = true;
+        }
+        else if(Input.GetKeyUp(KeyCode.F))
+        {
+            isFpressed = false;
+            anim.Play("Character Idle");
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground") && isJumping)
+        {
+            isJumping = false;
+        }
+    }
+}
