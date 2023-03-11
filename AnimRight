@@ -1,0 +1,76 @@
+using UnityEngine;
+
+public class AnimeRight : MonoBehaviour
+{
+    private Animator anim;
+    public Vector3 rightScale = new Vector3(0.2678204f, 0.255194f, 1f);
+    public Vector3 leftScale = new Vector3(-0.2678204f, 0.255194f, 1f);
+    private bool isJumping = false;
+    private bool isFacingLeft = false;
+    private bool isAttacking = false;
+
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+    }
+
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            anim.Play("Character Walking");
+            transform.localScale = rightScale;
+            isFacingLeft = false;
+        }
+        else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            anim.Play("Character Walking");
+            transform.localScale = leftScale;
+            isFacingLeft = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
+        {
+            isJumping = true;
+            anim.Play("JumpingAnim");
+            if (isFacingLeft)
+            {
+                transform.localScale = leftScale;
+            }
+        }
+        else if (isJumping)
+        {
+            // freeze the animation until landing on object tagged "Ground"
+            // check for landing on "Ground" here
+        }
+        else if(isAttacking)
+        {
+            if(anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 5f)
+            {
+                isAttacking = false;
+                anim.Play("Character Idle");
+            }
+        }
+        else
+        {
+            anim.Play("Character Idle");
+            if (isFacingLeft)
+            {
+                transform.localScale = leftScale;
+            }
+        }
+        
+        if (Input.GetKeyDown(KeyCode.E) && !isAttacking)
+        {
+            isAttacking = true;
+            anim.Play("Attack");
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground") && isJumping)
+        {
+            isJumping = false;
+        }
+    }
+}
